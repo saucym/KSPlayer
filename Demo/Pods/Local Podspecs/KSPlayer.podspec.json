@@ -5,7 +5,7 @@
   "description": "Video Player Using Swift, based on ffmpeg, support for the horizontal screen, vertical screen, the upper and lower slide to adjust the volume, the screen brightness, or so slide to adjust the playback progress.",
   "homepage": "https://github.com/kingslay/KSPlayer",
   "authors": {
-    "kintan": "554398854@qq.com"
+    "kintan": "kingslay@icloud.com"
   },
   "license": "MIT",
   "source": {
@@ -17,43 +17,25 @@
     "osx": "10.12",
     "tvos": "10.2"
   },
-  "swift_versions": "5.1",
+  "swift_versions": "5.2",
   "static_framework": true,
   "testspecs": [
     {
       "name": "Tests",
       "test_type": "unit",
-      "source_files": "Tests/*.swift",
-      "ios": {
-        "source_files": "Tests/iOS/*.swift"
-      },
-      "tvos": {
-        "source_files": "Tests/tvOS/*.swift"
-      },
-      "osx": {
-        "source_files": "Tests/macOS/*.swift"
-      },
-      "resources": "Tests/Resources/*"
+      "source_files": "Tests/KSPlayerTests/*.swift",
+      "resources": "Tests/KSPlayerTests/Resources/*"
     }
   ],
   "subspecs": [
     {
       "name": "UXKit",
-      "source_files": "Sources/UXKit/*.{swift}",
-      "ios": {
-        "source_files": "Sources/UXKit/iOS/*.swift"
-      },
-      "tvos": {
-        "source_files": "Sources/UXKit/iOS/*.swift"
-      },
-      "osx": {
-        "source_files": "Sources/UXKit/macOS/*.swift"
-      },
+      "source_files": "Sources/KSPlayer/UXKit/*.{swift}",
       "frameworks": "Foundation"
     },
     {
       "name": "Basic",
-      "source_files": "Sources/Basic/*.{swift}",
+      "source_files": "Sources/KSPlayer/Basic/*.{swift}",
       "dependencies": {
         "KSPlayer/UXKit": [
 
@@ -61,40 +43,12 @@
       }
     },
     {
-      "name": "SubtitleCore",
-      "source_files": "Sources/SubtitleCore/*.{swift}",
+      "name": "Subtitle",
+      "source_files": "Sources/KSPlayer/Subtitle/*.{swift}",
       "frameworks": "Foundation"
     },
     {
-      "name": "Subtitle",
-      "source_files": "Sources/Subtitle/*.{swift}",
-      "ios": {
-        "source_files": "Sources/Subtitle/iOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "tvos": {
-        "source_files": "Sources/Subtitle/iOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "osx": {
-        "source_files": "Sources/Subtitle/macOS/*.swift",
-        "frameworks": "AppKit"
-      },
-      "dependencies": {
-        "KSPlayer/Basic": [
-
-        ],
-        "KSPlayer/SubtitleCore": [
-
-        ],
-        "KSPlayer/Resources": [
-
-        ]
-      }
-    },
-    {
       "name": "FFmpeg",
-      "source_files": "Sources/FFmpegExt/**/*.{h,c}",
       "libraries": [
         "bz2",
         "z",
@@ -103,20 +57,20 @@
       ],
       "ios": {
         "xcconfig": {
-          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/FFmpeg/FFmpeg.xcframework/ios-arm64/FFmpeg.framework/Headers ${PODS_ROOT}/../../FFmpeg/FFmpeg.xcframework/ios-arm64/FFmpeg.framework/Headers"
+          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/Sources/FFmpeg.xcframework/ios-arm64/FFmpeg.framework/Headers ${PODS_ROOT}/../../Sources/FFmpeg.xcframework/ios-arm64/FFmpeg.framework/Headers"
         }
       },
       "tvos": {
         "xcconfig": {
-          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/FFmpeg/FFmpeg.xcframework/tvos-arm64/FFmpeg.framework/Headers ${PODS_ROOT}/../../FFmpeg/FFmpeg.xcframework/tvos-arm64/FFmpeg.framework/Headers"
+          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/Sources/FFmpeg.xcframework/tvos-arm64/FFmpeg.framework/Headers ${PODS_ROOT}/../../Sources/FFmpeg.xcframework/tvos-arm64/FFmpeg.framework/Headers"
         }
       },
       "osx": {
         "xcconfig": {
-          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/FFmpeg/FFmpeg.xcframework/macos-x86_64/FFmpeg.framework/Headers ${PODS_ROOT}/../../FFmpeg/FFmpeg.xcframework/macos-x86_64/FFmpeg.framework/Headers"
+          "HEADER_SEARCH_PATHS": "${PODS_ROOT}/KSPlayer/Sources/FFmpeg.xcframework/macos-x86_64/FFmpeg.framework/Headers ${PODS_ROOT}/../../Sources/FFmpeg.xcframework/macos-x86_64/FFmpeg.framework/Headers"
         }
       },
-      "vendored_frameworks": "FFmpeg/FFmpeg.xcframework",
+      "vendored_frameworks": "Sources/FFmpeg.xcframework",
       "dependencies": {
         "Openssl": [
 
@@ -125,18 +79,27 @@
     },
     {
       "name": "Metal",
-      "source_files": "Sources/Metal/*.{h,swift,metal}",
+      "source_files": "Sources/KSPlayer/Metal/*.{swift,metal}",
       "resource_bundles": {
         "Metal": [
-          "Sources/Metal/*.metal"
+          "Sources/KSPlayer/Metal/*.metal"
         ]
       },
       "weak_frameworks": "MetalKit"
     },
     {
       "name": "AVPlayer",
-      "source_files": "Sources/AVPlayer/*.{swift}",
+      "source_files": "Sources/KSPlayer/AVPlayer/*.{swift}",
       "frameworks": "AVFoundation",
+      "ios": {
+        "frameworks": "UIKit"
+      },
+      "tvos": {
+        "frameworks": "UIKit"
+      },
+      "osx": {
+        "frameworks": "AppKit"
+      },
       "dependencies": {
         "KSPlayer/Basic": [
 
@@ -145,7 +108,7 @@
     },
     {
       "name": "MEPlayer",
-      "source_files": "Sources/MEPlayer/**/*.{swift}",
+      "source_files": "Sources/KSPlayer/MEPlayer/**/*.{swift}",
       "frameworks": [
         "AudioToolbox",
         "VideoToolbox"
@@ -160,71 +123,28 @@
         "KSPlayer/Metal": [
 
         ],
-        "KSPlayer/SubtitleCore": [
+        "KSPlayer/Subtitle": [
 
         ]
       }
     },
     {
       "name": "Core",
-      "source_files": "Sources/Core/*",
-      "ios": {
-        "source_files": "Sources/Core/iOS/*.swift"
-      },
-      "tvos": {
-        "source_files": "Sources/Core/iOS/*.swift"
-      },
-      "osx": {
-        "source_files": "Sources/Core/macOS/*.swift"
-      },
+      "source_files": "Sources/KSPlayer/Core/*",
       "dependencies": {
         "KSPlayer/AVPlayer": [
 
-        ],
-        "KSPlayer/Resources": [
-
+        ]
+      },
+      "resource_bundles": {
+        "KSResources": [
+          "Sources/KSPlayer/Core/Resources/*"
         ]
       }
     },
     {
       "name": "Audio",
-      "source_files": "Sources/Audio/*.swift",
-      "ios": {
-        "source_files": "Sources/Audio/iOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "tvos": {
-        "source_files": "Sources/Audio/iOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "osx": {
-        "source_files": "Sources/Audio/macOS/*.swift",
-        "frameworks": "AppKit"
-      },
-      "dependencies": {
-        "KSPlayer/Core": [
-
-        ],
-        "KSPlayer/SubtitleCore": [
-
-        ]
-      }
-    },
-    {
-      "name": "Video",
-      "source_files": "Sources/Video/*.swift",
-      "ios": {
-        "source_files": "Sources/Video/iOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "tvos": {
-        "source_files": "Sources/Video/tvOS/*.swift",
-        "frameworks": "UIKit"
-      },
-      "osx": {
-        "source_files": "Sources/Video/macOS/*.swift",
-        "frameworks": "AppKit"
-      },
+      "source_files": "Sources/KSPlayer/Audio/*.swift",
       "dependencies": {
         "KSPlayer/Core": [
 
@@ -235,13 +155,17 @@
       }
     },
     {
-      "name": "Resources",
-      "resource_bundles": {
-        "KSResources": [
-          "Sources/Resources/*.xcassets"
+      "name": "Video",
+      "source_files": "Sources/KSPlayer/Video/*.swift",
+      "dependencies": {
+        "KSPlayer/Core": [
+
+        ],
+        "KSPlayer/Subtitle": [
+
         ]
       }
     }
   ],
-  "swift_version": "5.1"
+  "swift_version": "5.2"
 }

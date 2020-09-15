@@ -10,7 +10,7 @@ import KSPlayer
 import UIKit
 class TableViewCell: UITableViewCell {
     var nameLabel: UILabel
-    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         nameLabel = UILabel()
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(nameLabel)
@@ -59,7 +59,7 @@ class MasterViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
         if let url = URL(string: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4") {
             let res0 = KSPlayerResourceDefinition(url: url, definition: "高清")
-            let res1 = KSPlayerResourceDefinition(url: url, definition: "标清")
+            let res1 = KSPlayerResourceDefinition(url: URL(string: "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8")!, definition: "标清")
             let asset = KSPlayerResource(name: "http视频", definitions: [res0, res1], cover: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/848px-Big_buck_bunny_poster_big.jpg"))
             objects.append(asset)
         }
@@ -79,10 +79,16 @@ class MasterViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let url = URL(string: "http://dash.edgesuite.net/akamai/bbb_30fps/bbb_30fps.mpd") {
             objects.append(KSPlayerResource(url: url, options: KSOptions(), name: "dash视频"))
         }
-        if let url = URL(string: "https://bitlivedemo-a.akamaihd.net/m3u8s/bitcodin.m3u8") {
+        if let url = URL(string: "https://devstreaming-cdn.apple.com/videos/wwdc/2019/244gmopitz5ezs2kkq/244/hls_vod_mvp.m3u8") {
             let options = KSOptions()
             options.formatContextOptions["timeout"] = 0
             objects.append(KSPlayerResource(url: url, options: options, name: "https视频"))
+        }
+        
+        if let url = URL(string: "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov") {
+            let options = KSOptions()
+            options.formatContextOptions["timeout"] = 0
+            objects.append(KSPlayerResource(url: url, options: options, name: "rtsp video"))
         }
 
         if let path = Bundle.main.path(forResource: "Polonaise", ofType: "flac") {
@@ -106,11 +112,11 @@ class MasterViewController: UIViewController, UITableViewDelegate, UITableViewDa
     // MARK: - Table View
 
     func numberOfSections(in _: UITableView) -> Int {
-        return 1
+        1
     }
 
     func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return objects.count
+        objects.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -124,11 +130,13 @@ class MasterViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if let split = splitViewController, let nav = split.viewControllers.last as? UINavigationController, let detail = nav.topViewController as? DetailProtocol {
-                detail.resource = objects[indexPath.row]
-                detail.navigationItem.leftBarButtonItem = split.displayModeButtonItem
-                detail.navigationItem.leftItemsSupplementBackButton = true
-                split.preferredDisplayMode = .primaryHidden
-                return
+            detail.resource = objects[indexPath.row]
+            #if os(iOS)
+            detail.navigationItem.leftBarButtonItem = split.displayModeButtonItem
+            detail.navigationItem.leftItemsSupplementBackButton = true
+            #endif
+            split.preferredDisplayMode = .primaryHidden
+            return
         }
         let controller: DetailProtocol
         if indexPath.row == objects.count - 1 {

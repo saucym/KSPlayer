@@ -83,11 +83,15 @@ install_xcframework() {
   # Locate the correct slice of the .xcframework for the current architectures
   local target_path=""
   local target_arch="$ARCHS"
+
+  # Replace spaces in compound architectures with _ to match slice format
+  target_arch=${target_arch// /_}
+
   local target_variant=""
   if [[ "$PLATFORM_NAME" == *"simulator" ]]; then
     target_variant="simulator"
   fi
-  if [[ "$EFFECTIVE_PLATFORM_NAME" == *"maccatalyst" ]]; then
+  if [[ ! -z ${EFFECTIVE_PLATFORM_NAME+x} && "$EFFECTIVE_PLATFORM_NAME" == *"maccatalyst" ]]; then
     target_variant="maccatalyst"
   fi
   for i in ${!paths[@]}; do
@@ -120,12 +124,12 @@ install_xcframework() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_xcframework "${PODS_ROOT}/../../FFmpeg/FFmpeg.xcframework" "" "false" "ios-x86_64-simulator/FFmpeg.framework" "ios-x86_64-maccatalyst/FFmpeg.framework" "ios-arm64/FFmpeg.framework"
-  install_xcframework "${PODS_ROOT}/../../FFmpeg/OpenSSL.xcframework" "" "false" "ios-x86_64-simulator/OpenSSL.framework" "ios-x86_64-maccatalyst/OpenSSL.framework" "ios-arm64/OpenSSL.framework"
+  install_xcframework "${PODS_ROOT}/../../Sources/FFmpeg.xcframework" "" "false" "ios-x86_64-maccatalyst/FFmpeg.framework" "ios-x86_64-simulator/FFmpeg.framework" "ios-arm64/FFmpeg.framework"
+  install_xcframework "${PODS_ROOT}/../../Sources/OpenSSL.xcframework" "" "false" "ios-x86_64-simulator/OpenSSL.framework" "ios-x86_64-maccatalyst/OpenSSL.framework" "ios-arm64/OpenSSL.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_xcframework "${PODS_ROOT}/../../FFmpeg/FFmpeg.xcframework" "" "false" "ios-x86_64-simulator/FFmpeg.framework" "ios-x86_64-maccatalyst/FFmpeg.framework" "ios-arm64/FFmpeg.framework"
-  install_xcframework "${PODS_ROOT}/../../FFmpeg/OpenSSL.xcframework" "" "false" "ios-x86_64-simulator/OpenSSL.framework" "ios-x86_64-maccatalyst/OpenSSL.framework" "ios-arm64/OpenSSL.framework"
+  install_xcframework "${PODS_ROOT}/../../Sources/FFmpeg.xcframework" "" "false" "ios-x86_64-maccatalyst/FFmpeg.framework" "ios-x86_64-simulator/FFmpeg.framework" "ios-arm64/FFmpeg.framework"
+  install_xcframework "${PODS_ROOT}/../../Sources/OpenSSL.xcframework" "" "false" "ios-x86_64-simulator/OpenSSL.framework" "ios-x86_64-maccatalyst/OpenSSL.framework" "ios-arm64/OpenSSL.framework"
 fi
 
 echo "Artifact list stored at $ARTIFACT_LIST_FILE"

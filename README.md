@@ -1,39 +1,41 @@
-# KSPlayer
+![Build Status](https://img.shields.io/badge/build-%20passing%20-brightgreen.svg)
+![Platform](https://img.shields.io/badge/Platform-%20iOS%20macOS%20tvOS%20-blue.svg)
 
-## 一、介绍
-KSPlayer是一款基于 AVPlayer, FFmpeg  纯Swift的音视频播放器，支持所有视频格式和全景视频，支持苹果全平台。实现高可用，高性能的音视频播放能力。它包含UI控件模块、字幕模块、播放器内核模块。这些模块都是解耦的，可以通过pod按需接入。
+# KSPlayer 
 
- [原理详解](https://github.com/kingslay/KSPlayer/blob/master/documents/KSPlayer原理详解.md) 
+- KSPlayer is a powerful media play framework foriOS, tvOS, macOS,Mac Catalyst, SwiftUI.
 
-## 二、功能
-- [x] 首屏秒开
-- [x] 无缝循环播放
-- [x] 精确seek
-- [x] 支持外挂字幕、内挂字幕
-- [x] 倍速播放
-- [x] 支持iOS、macOS、tvOS
-- [x] 支持360°全景视频
-- [x] 使用Metal进行渲染
-- [x] 支持所有媒体格式(自动切换KSAVPlayer和KSMEPlayer)
-- [x] 支持横竖屏切换，支持自动旋转屏幕
-- [x] 右侧 1/2 位置上下滑动调节屏幕亮度（模拟器调不了亮度，请在真机调试）
-- [x] 左侧 1/2 位置上下滑动调节音量（模拟器调不了音量，请在真机调试）
-- [x] 左右滑动调节播放进度
-- [x] 清晰度切换
-- [x] H.264 H.265 硬件解码（VideoToolBox）
-- [x] 首屏耗时，缓冲次数，缓冲时长监控
-- [x] AirPlay
-- [x] Bitcode
+## Based On
 
-## 三、要求
+- FFmpeg
+- Metal
+- AudioUnit
+
+## Features
+
+- iOS, tvOS, macOS,Mac Catalyst, SwiftUI.
+- 360° panorama video.
+- Background playback.
+- RTMP/RTSP/Dash/HLS streaming.
+- Setting playback speed.
+- Multiple audio/video tracks.
+- H.264/H.265 hardware accelerator.
+
+## Requirements
+
 - iOS 10 +,  macOS 10.12 +, tvOS 10.2 +
 - Xcode 11
-- Swift 5.1
+- Swift 5.2
 
-## 四、安装
-### CocoaPods
+## Demo
 
-确保使用最新版本 **cocoapods 1.9**, 可以使用命令 ` brew install cocoapods` 来安装
+- Open Demo/Demo.xcworkspace with Xcode.
+
+## Quick Start
+
+#### CocoaPods
+
+Make sure to use the latest version **cocoapods 1.9**, which can be installed using the command `brew install cocoapods`
 
 ```ruby
 target 'ProjectName' do
@@ -49,13 +51,11 @@ end
 git "https://github.com/kingslay/KSPlayer.git" "master"
 ```
 
-### Demo
 
-进Demo目录打开Demo.xcworkspace。
 
-## 五、使用
+## Usage
 
-### 初始化
+#### initialize
 
 ```swift
 KSPlayerManager.secondPlayerType = KSMEPlayer.self
@@ -77,14 +77,14 @@ playerView.backBlock = { [unowned self] in
 }
 ```
 
-### 设置普通视频
+#### Setting up a regular video
 
 ```swift
 playerView.set(url:URL(string: "http://baobab.wdjcdn.com/14525705791193.mp4")!)
-playerView.set(resource: KSPlayerResource(url: url, name: name!, cover: URL(string: "http://img.wdjimg.com/image/video/447f973848167ee5e44b67c8d4df9839_0_0.jpeg"), subtitle: nil))
+playerView.set(resource: KSPlayerResource(url: url, name: name!, cover: URL(string: "http://img.wdjimg.com/image/video/447f973848167ee5e44b67c8d4df9839_0_0.jpeg"), subtitleURL: URL(string: "http://example.ksplay.subtitle")))
 ```
 
-### 多清晰度，带封面视频
+#### Multi-definition, with cover video
 
 ```swift
 let res0 = KSPlayerResourceDefinition(url: URL(string: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")!,
@@ -95,10 +95,10 @@ let res1 = KSPlayerResourceDefinition(url: URL(string: "http://clips.vorwaerts-g
 let asset = KSPlayerResource(name: "Big Buck Bunny",
                              definitions: [res0, res1],
                              cover: URL(string: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_buck_bunny_poster_big.jpg/848px-Big_buck_bunny_poster_big.jpg"))
-
 playerView.set(resource: asset)
 ```
-### 设置 HTTP header
+
+#### Setting up an HTTP header
 
 ```swift
 let header = ["User-Agent":"KSPlayer"]
@@ -114,7 +114,8 @@ let asset = KSPlayerResource(name: "Video Name",
 playerView.set(resource: asset)
 ```
 
-### 监听状态变化
+#### Listening status change
+
 ```swift
 //Listen to when the play time changes
 playerView.playTimeDidChange = { (currentTime: TimeInterval, totalTime: TimeInterval) in
@@ -132,12 +133,48 @@ public protocol PlayerControllerDelegate: class {
 }
 ```
 
+## Advanced Usage
 
+- ### Inherits PlayerView's custom play logic and UI.
 
-## 六、进阶用法
-- 继承 PlayerView 自定义播放逻辑和UI。
+  ```swift
+  class CustomVideoPlayerView: IOSVideoPlayerView {
+      override func updateUI(isLandscape: Bool) {
+          super.updateUI(isLandscape: isLandscape)
+          toolBar.playbackRateButton.isHidden = true
+      }
+  
+      override func onButtonPressed(type: PlayerButtonType, button: UIButton) {
+          if type == .landscape {
+              // xx
+          } else {
+              super.onButtonPressed(type: type, button: button)
+          }
+      }
+  }
+  ```
 
-- 设置KSPlayerManager 、KSOptions里面的属性
+  
+
+- ### Selecting Tracks
+
+  ```swift
+     override open func player(layer: KSPlayerLayer, state: KSPlayerState) {
+          super.player(layer: layer, state: state)
+          if state == .readyToPlay, let player = layer.player {
+              let tracks = player.tracks(mediaType: .audio)
+              let track = tracks[1]
+              /// the name of the track
+              let name = track.name
+              /// the language of the track
+              let language = track.language
+              /// selecting the one
+              player.select(track: track)
+          }
+     }
+  ```
+
+- ### Set the properties in KSPlayerManager and KSOptions.
 
   ```swift
   public struct KSPlayerManager {
@@ -193,10 +230,28 @@ public protocol PlayerControllerDelegate: class {
   ```
 
 
-## 七、效果:
+## Effect
 
 ![gif](https://github.com/kingslay/KSPlayer/raw/master/Demo/demo.gif)
 
-## 八、参考：
-本项目参考了 [ZFPlayer](https://github.com/renzifeng/ZFPlayer)、**[SGPlayer](https://github.com/libobjc/SGPlayer)**
+## Debug FFmpeg
 
+```bash
+brew install sdl2
+cd Script
+sh build-openssl.sh
+sh build-ffmpeg.sh debug
+dwarfdump -F --debug-info ../Sources/FFmpeg.xcframework/ios-x86_64-maccatalyst/FFmpeg.framework/FFmpeg | head -n 20
+```
+
+run demo-iOS use Mac Catalyst
+
+![6](https://github.com/kingslay/KSPlayer/blob/develop/documents/6.png?raw=true)
+
+## Reference
+
+This item references the  [ZFPlayer](https://github.com/renzifeng/ZFPlayer)、**[SGPlayer](https://github.com/libobjc/SGPlayer)**
+
+## Communication
+
+- Email : kingslay@icloud.com
